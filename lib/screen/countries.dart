@@ -39,12 +39,27 @@ class _AllCountriesState extends State<AllCountries> {
            padding: EdgeInsets.all(10),
            // we create a listview with children cause it could holp more than one widgets
            
+           // integrate future build in our project
             child: FutureBuilder<List>(
               future: lcountries,
               builder: (BuildContext context, AsyncSnapshot<List> snapshot ){
                 if(snapshot.hasData){
-                  print(snapshot.data);
-                  return Text('hello');
+                  
+                  return ListView.builder(itemBuilder: (BuildContext context,int index){
+                    return  GestureDetector(
+                 onTap: (){
+                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Country('DRCongo')
+                   ));
+                 },
+              child: Card(
+             elevation: 10,
+             child: Padding(
+               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+               child: Text(snapshot.data[index]['name']),
+             ),
+           ),
+               );
+                  });
                 }
                 return null;
               },)
