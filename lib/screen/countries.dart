@@ -48,7 +48,7 @@ class _AllCountriesState extends State<AllCountries> {
                   return ListView.builder(itemBuilder: (BuildContext context,int index){
                     return  GestureDetector(
                  onTap: (){
-                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Country('DRCongo')
+                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Country(snapshot.data[index])
                    ));
                  },
               child: Card(
