@@ -14,16 +14,25 @@ class AllCountries extends StatefulWidget {
 
 class _AllCountriesState extends State<AllCountries> {
   var response;
-  Future<List> lcountries;
- Future<List> getcountries() async {
+  List lcountries = [];
+  bool isSearching = false;
+  getcountries() async {
      response = await Dio().get('https://restcountries.eu/rest/v2/all');
      return response.data;
   }
   @override
   void initState() {
-    lcountries = getcountries();
+    getcountries().then((data){
+      setState(() {
+       lcountries = data; 
+      });
+    });
     
     super.initState();
+  }
+
+  void _filterCountries(value){
+    print(value);
   }
   @override
 
@@ -33,36 +42,56 @@ class _AllCountriesState extends State<AllCountries> {
        child: Scaffold(
          appBar: AppBar(
            backgroundColor: Colors.pink,
-           title: Text("All contries"),
+           title: !isSearching ? Text("All contries") : 
+           TextField(
+             onChanged: (value){
+               _filterCountries(value);
+             },
+             style: TextStyle(color: Colors.white),
+             decoration:InputDecoration(
+               icon: Icon(Icons.search,color: Colors.white),
+               hintText: 'Search Country',
+               hintStyle: TextStyle(color: Colors.white)
+               ),),
+           actions: <Widget>[
+             isSearching ?
+             IconButton(
+                 icon: Icon(Icons.cancel,color: Colors.white), onPressed: (){
+                   setState(() {
+                     this.isSearching = false;
+                   });
+                 }) :
+                  IconButton(
+                 icon: Icon(Icons.search,color: Colors.white), onPressed: (){
+                   setState(() {
+                     this.isSearching = true;
+                   });
+                 })
+           ],
          ),
          body: Container(
            padding: EdgeInsets.all(10),
            // we create a listview with children cause it could holp more than one widgets
            
            // integrate future build in our project
-            child: FutureBuilder<List>(
-              future: lcountries,
-              builder: (BuildContext context, AsyncSnapshot<List> snapshot ){
-                if(snapshot.hasData){
-                  
-                  return ListView.builder(itemBuilder: (BuildContext context,int index){
+            child: lcountries.length > 0 ? ListView.builder(
+              itemCount: lcountries.length,
+              itemBuilder: (BuildContext context,int index){
                     return  GestureDetector(
                  onTap: (){
-                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Country(snapshot.data[index])
+                   Navigator.of(context).push(MaterialPageRoute(builder: (context)=>Country(lcountries[index])
                    ));
                  },
               child: Card(
              elevation: 10,
              child: Padding(
                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
-               child: Text(snapshot.data[index]['name']),
+               child: Text(lcountries[index]['name']),
              ),
            ),
                );
-                  });
-                }
-                return null;
-              },)
+                  }): Center(
+                    child :CircularProgressIndicator()), 
          )
        )
     );
